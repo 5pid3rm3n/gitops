@@ -59,7 +59,7 @@ jobs:
 
           # If there are any changes, send the PUT request
           if [ "$CHANGES" != "{}" ]; then
-            Send the PUT request
+
             curl -X PUT "https://api.bricks-dev.com/api/v1/environment/$ID/edit" \
               -H "Content-Type: application/json" \
               -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" \
