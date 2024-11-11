@@ -1,0 +1,38 @@
+name: Make Environment Files
+
+on:
+  workflow_dispatch:
+
+jobs:
+  make-env-files:
+    runs-on: ubuntu-latest
+    strategy:
+        fail-fast: true
+        
+    steps:
+    - name: Checkout repository content
+      uses: actions/checkout@v4
+
+    - name: Fetch environments
+      env:
+        API_TOKEN: ${{ secrets.API_TOKEN }}
+      run: |
+        curl -s -f -o response.json --location 'https://api.bricks-dev.com/api/v1/environments?all=true&expand=false&limit=10&offset=0' --header 'Authorization: Bearer ${{ secrets.API_TOKEN }}'
+
+    - name: Create new environment files
+      run: |
+        jq -c '.list[]' response.json | while read -r item; do slug=$(jq -r '.slug' <<< "$item"); jq '{type: "environment"} + .' <<< "$item" > "${slug}.json"; done
+
+    - name: remove temp files
+      run: |
+        rm response.json
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git status --short | grep '?? .*\.json' | awk '{print $2}' | xargs git add
+        git commit -m "Add new files with JSON content"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
