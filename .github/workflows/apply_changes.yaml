@@ -59,11 +59,11 @@ jobs:
 
           # If there are any changes, send the PUT request
           if [ "$CHANGES" != "{}" ]; then
-            # Send the PUT request
-            # curl -X PUT "https://api.bricks-dev.com/api/v1/environment/$ID/edit" \
-            #   -H "Content-Type: application/json" \
-            #   -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im1VUEt1SkE1NlljR3V4RE5rQnJUdCJ9.eyJlbWFpbCI6ImlkYW5AYmx1ZWJyaWNrcy5jbyIsIm9yZ2FuaXphdGlvbiI6ImJsdWVicmlja3MiLCJpc3MiOiJodHRwczovL2F1dGguYnJpY2tzLWRldi5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTAyNzA3NzExNTE0NjQxNzM1MjQiLCJhdWQiOlsiaHR0cHM6Ly9ibHVlYnJpY2tzLWFwaS1kZXYiLCJodHRwczovL2JsdWVicmlja3MtZGV2ZWxvcC5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzMxMjUxNzc5LCJleHAiOjE3MzEzMzgxNzksInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJvcmdfaWQiOiJvcmdfZTVPaDFhZXh3NE9VRFptZCIsImF6cCI6ImxFeERXQ045WWZ1cG5MV29aTzBFQWNkODhoMUNrQmpVIiwicGVybWlzc2lvbnMiOlsiY3JlYXRlOmNsb3VkIiwiY3JlYXRlOmRlcGxveW1lbnQiLCJjcmVhdGU6ZW52aXJvbm1lbnQiLCJjcmVhdGU6cGFja2FnZSIsImNyZWF0ZTp1c2VycyIsImRlbGV0ZTpjbG91ZCIsImRlbGV0ZTplbnZpcm9ubWVudCIsImRlbGV0ZTpwYWNrYWdlIiwiZGVsZXRlOnVzZXJzIiwicmVhZDpjbG91ZCIsInJlYWQ6ZGVwbG95bWVudCIsInJlYWQ6ZGVwbG95bWVudC1wbGFuIiwicmVhZDplbnZpcm9ubWVudCIsInJlYWQ6b3JnYW5pemF0aW9uIiwicmVhZDpwYWNrYWdlIiwicmVhZDpyZXNjdWUiLCJyZWFkOnRhc2siLCJyZWFkOnVzZXJzIiwicmVhZDp2ZW5kb3IiLCJ1cGRhdGU6ZGVwbG95bWVudCIsInVwZGF0ZTplbnZpcm9ubWVudCIsInVwZGF0ZTpvcmdhbml6YXRpb24iLCJ1cGRhdGU6cGFja2FnZSIsInVwZGF0ZTp1c2VycyJdfQ.g2FCgP7-b9KbXAhX1Uw2wlLp-qmizUAemeM8_4bS0kWZXkki1bEwj7w03Dkvr2a97c4YLMLiYOxqvj8VQJ7g7hb8khwoWySTAGEKjMYLZu8M7JpmMjee_ec3iz_vzp7KsZ6Gita1X8MOxp_xBR58wozbFZ52_dQXcqnFSW7yWsPhOBuhlhx5pKe34CDswm4Bha9oq9bRY_qi1Na26yIT1ld-S_HKq6paENS_zngr_xGOh46oTjYEzrJHvVJoQTv4SbPVzyLK7OFDFVrYGM5gbFiKauSBZZ6dl97nGWuEuiNxSoS-KL0wJ0qBFRKYmFfBn4aZDxgP0XgkUXsrrXkS2A" \
-            #   -d "$CHANGES"
+            Send the PUT request
+            curl -X PUT "https://api.bricks-dev.com/api/v1/environment/$ID/edit" \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" \
+              -d "$CHANGES"
             echo "$CHANGES"
             ::debug::$CHANGES
 
