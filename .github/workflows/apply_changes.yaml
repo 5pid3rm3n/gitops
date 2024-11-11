@@ -65,7 +65,6 @@ jobs:
               -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" \
               -d "$CHANGES"
             echo "$CHANGES"
-            ::debug::$CHANGES
 
             echo "Updated fields for ID: $ID from file $ENVS_JSON"
           else
