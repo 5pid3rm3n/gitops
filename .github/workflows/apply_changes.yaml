@@ -1,0 +1,77 @@
+name: Apply changes to environments
+
+on:
+  workflow_dispatch:
+
+jobs:
+  apply-changes-to-environments:
+    runs-on: ubuntu-latest
+    strategy:
+        fail-fast: true
+        
+    steps:
+    - name: Checkout repository content
+      uses: actions/checkout@v4
+
+    - name: Fetch environments
+      run: |
+        curl -s -f -o response.json --location 'https://api.bricks-dev.com/api/v1/environments?all=true&expand=false&limit=10&offset=0' --header 'Authorization: Bearer ${{ secrets.API_TOKEN }}'
+
+    - name: Run JSON update script
+      run: |
+        # Define the path to the large JSON file
+        RESPONSE_JSON="response.json"
+
+        # Loop through each small JSON file in the current directory
+        for ENVS_JSON in *.json; do
+          # Skip the large JSON file
+          if [[ "$ENVS_JSON" == "$RESPONSE_JSON" ]]; then
+            continue
+          fi
+
+          # Extract the ID from the current small JSON file
+          ID=$(jq -r '.id' "$ENVS_JSON")
+
+          # Extract the corresponding item from the large JSON file using the ID
+          LARGE_COLOR=$(jq -r --arg ID "$ID" '.list[] | select(.id == $ID) | .color' "$RESPONSE_JSON")
+          SMALL_COLOR=$(jq -r '.color' "$ENVS_JSON")
+          
+          LARGE_NAME=$(jq -r --arg ID "$ID" '.list[] | select(.id == $ID) | .name' "$RESPONSE_JSON")
+          SMALL_NAME=$(jq -r '.name' "$ENVS_JSON")
+
+          # Initialize an empty JSON object for changes
+          CHANGES="{}"
+
+          # Compare the color field
+          if [[ "$LARGE_COLOR" != "$SMALL_COLOR" ]]; then
+            CHANGES=$(jq -n --arg color "$SMALL_COLOR" '{color: $color}')
+          fi
+
+          # Compare the name field
+          if [[ "$LARGE_NAME" != "$SMALL_NAME" ]]; then
+            # If color changes already exist, add the name change to the existing object
+            if [ "$CHANGES" != "{}" ]; then
+              CHANGES=$(echo "$CHANGES" | jq --arg name "$SMALL_NAME" '. + {name: $name}')
+            else
+              CHANGES=$(jq -n --arg name "$SMALL_NAME" '{name: $name}')
+            fi
+          fi
+
+          # If there are any changes, send the PUT request
+          if [ "$CHANGES" != "{}" ]; then
+            # Send the PUT request
+            # curl -X PUT "https://api.bricks-dev.com/api/v1/environment/$ID/edit" \
+            #   -H "Content-Type: application/json" \
+            #   -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im1VUEt1SkE1NlljR3V4RE5rQnJUdCJ9.eyJlbWFpbCI6ImlkYW5AYmx1ZWJyaWNrcy5jbyIsIm9yZ2FuaXphdGlvbiI6ImJsdWVicmlja3MiLCJpc3MiOiJodHRwczovL2F1dGguYnJpY2tzLWRldi5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTAyNzA3NzExNTE0NjQxNzM1MjQiLCJhdWQiOlsiaHR0cHM6Ly9ibHVlYnJpY2tzLWFwaS1kZXYiLCJodHRwczovL2JsdWVicmlja3MtZGV2ZWxvcC5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzMxMjUxNzc5LCJleHAiOjE3MzEzMzgxNzksInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJvcmdfaWQiOiJvcmdfZTVPaDFhZXh3NE9VRFptZCIsImF6cCI6ImxFeERXQ045WWZ1cG5MV29aTzBFQWNkODhoMUNrQmpVIiwicGVybWlzc2lvbnMiOlsiY3JlYXRlOmNsb3VkIiwiY3JlYXRlOmRlcGxveW1lbnQiLCJjcmVhdGU6ZW52aXJvbm1lbnQiLCJjcmVhdGU6cGFja2FnZSIsImNyZWF0ZTp1c2VycyIsImRlbGV0ZTpjbG91ZCIsImRlbGV0ZTplbnZpcm9ubWVudCIsImRlbGV0ZTpwYWNrYWdlIiwiZGVsZXRlOnVzZXJzIiwicmVhZDpjbG91ZCIsInJlYWQ6ZGVwbG95bWVudCIsInJlYWQ6ZGVwbG95bWVudC1wbGFuIiwicmVhZDplbnZpcm9ubWVudCIsInJlYWQ6b3JnYW5pemF0aW9uIiwicmVhZDpwYWNrYWdlIiwicmVhZDpyZXNjdWUiLCJyZWFkOnRhc2siLCJyZWFkOnVzZXJzIiwicmVhZDp2ZW5kb3IiLCJ1cGRhdGU6ZGVwbG95bWVudCIsInVwZGF0ZTplbnZpcm9ubWVudCIsInVwZGF0ZTpvcmdhbml6YXRpb24iLCJ1cGRhdGU6cGFja2FnZSIsInVwZGF0ZTp1c2VycyJdfQ.g2FCgP7-b9KbXAhX1Uw2wlLp-qmizUAemeM8_4bS0kWZXkki1bEwj7w03Dkvr2a97c4YLMLiYOxqvj8VQJ7g7hb8khwoWySTAGEKjMYLZu8M7JpmMjee_ec3iz_vzp7KsZ6Gita1X8MOxp_xBR58wozbFZ52_dQXcqnFSW7yWsPhOBuhlhx5pKe34CDswm4Bha9oq9bRY_qi1Na26yIT1ld-S_HKq6paENS_zngr_xGOh46oTjYEzrJHvVJoQTv4SbPVzyLK7OFDFVrYGM5gbFiKauSBZZ6dl97nGWuEuiNxSoS-KL0wJ0qBFRKYmFfBn4aZDxgP0XgkUXsrrXkS2A" \
+            #   -d "$CHANGES"
+            echo "$CHANGES"
+            ::debug::$CHANGES
+
+            echo "Updated fields for ID: $ID from file $ENVS_JSON"
+          else
+            echo "No changes detected for ID: $ID from file $ENVS_JSON"
+          fi
+        done
+
+        # remove temp files
+        rm response.json
