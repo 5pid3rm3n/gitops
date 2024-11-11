@@ -60,15 +60,13 @@ jobs:
           # If there are any changes, send the PUT request
           if [ "$CHANGES" != "{}" ]; then
 
-            curl -X PUT "https://api.bricks-dev.com/api/v1/environment/$ID/edit" \
+            curl -s -X PUT "https://api.bricks-dev.com/api/v1/environment/$ID/edit" \
               -H "Content-Type: application/json" \
               -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" \
               -d "$CHANGES"
             echo "$CHANGES"
 
             echo "Updated fields for ID: $ID from file $ENVS_JSON"
-          else
-            echo "No changes detected for ID: $ID from file $ENVS_JSON"
           fi
         done
 
