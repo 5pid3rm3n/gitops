@@ -1,0 +1,11 @@
+{
+  "type": "environment",
+  "id": "74ff75f0-a602-4bd9-a648-02919a97430f",
+  "name": "test creating from deploy",
+  "slug": "test-creating-from-deploy-9",
+  "color": "#B3B8C0",
+  "is_default": false,
+  "is_active": true,
+  "created": "2024-10-15T09:38:03.792Z",
+  "cloud_account": "ba82988e-4262-4707-9746-03ee30f63ba4"
+}

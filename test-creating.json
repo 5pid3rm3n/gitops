@@ -1,0 +1,10 @@
+{
+  "type": "environment",
+  "id": "dbcf90e1-a209-46ad-bc7d-e86dd302d12c",
+  "name": "test creating",
+  "slug": "test-creating",
+  "color": "#B3B8C0",
+  "is_default": false,
+  "is_active": true,
+  "created": "2024-10-15T10:27:09.740Z"
+}

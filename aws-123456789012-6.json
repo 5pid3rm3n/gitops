@@ -1,0 +1,11 @@
+{
+  "type": "environment",
+  "id": "ebae4a17-e286-4a9b-84f1-3885b6112b88",
+  "name": "production_yes_real",
+  "slug": "aws-123456789012-6",
+  "color": "#9C0000",
+  "is_default": false,
+  "is_active": true,
+  "created": "2024-10-08T16:54:23.309Z",
+  "cloud_account": "ba82988e-4262-4707-9746-03ee30f63ba4"
+}

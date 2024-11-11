@@ -1,0 +1,11 @@
+{
+  "type": "environment",
+  "id": "104f876b-c148-4c7e-9990-361a03622452",
+  "name": "bbx-develop",
+  "slug": "bbx-develop",
+  "color": "#C6951A",
+  "is_default": false,
+  "is_active": true,
+  "created": "2024-10-15T06:18:20.912Z",
+  "cloud_account": "ba82988e-4262-4707-9746-03ee30f63ba4"
+}
