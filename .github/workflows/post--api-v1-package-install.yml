@@ -1,0 +1,46 @@
+name: post--api-v1-package-install
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "package"
+        required: true
+        type: string
+      version:
+        description: "version"
+        required: false
+        type: string
+      force:
+        description: "force"
+        required: false
+        type: boolean
+      env:
+        description: "env"
+        required: false
+        type: string
+      slug:
+        description: "slug"
+        required: false
+        type: string
+      props:
+        description: "props"
+        required: false
+        type: string
+      deployment:
+        description: "deployment"
+        required: false
+        type: string
+
+jobs:
+  api-call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make API Request
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.API_BASE_URL }}/api/v1/package/install
+          method: POST
+          customHeaders: '{"Content-Type": "application/json"}'
+          bearerToken: ${{ secrets.API_TOKEN }}
+          data: ${{ toJSON(inputs) }}

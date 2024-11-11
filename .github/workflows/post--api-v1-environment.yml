@@ -1,0 +1,30 @@
+name: post--api-v1-environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "name"
+        required: true
+        type: string
+      color:
+        description: "color"
+        required: false
+        type: string
+      default:
+        description: "default"
+        required: false
+        type: boolean
+
+jobs:
+  api-call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make API Request
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.API_BASE_URL }}/api/v1/environment
+          method: POST
+          customHeaders: '{"Content-Type": "application/json"}'
+          bearerToken: ${{ secrets.API_TOKEN }}
+          data: ${{ toJSON(inputs) }}

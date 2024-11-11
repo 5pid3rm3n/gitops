@@ -1,0 +1,22 @@
+name: put--api-v1-environment-{idOrSlug}-clone
+
+on:
+  workflow_dispatch:
+    inputs:
+      idOrSlug:
+        description: "idOrSlug"
+        required: true
+        type: string
+
+jobs:
+  api-call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make API Request
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.API_BASE_URL }}/api/v1/environment/{idOrSlug}/clone
+          method: PUT
+          customHeaders: '{"Content-Type": "application/json"}'
+          bearerToken: ${{ secrets.API_TOKEN }}
+          data: ${{ toJSON(inputs) }}

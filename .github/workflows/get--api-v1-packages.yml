@@ -1,0 +1,50 @@
+name: get--api-v1-packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "all"
+        required: false
+        type: string
+      latest:
+        description: "latest"
+        required: false
+        type: string
+      sort:
+        description: "sort"
+        required: false
+        type: string
+      order:
+        description: "order"
+        required: false
+        type: string
+      offset:
+        description: "offset"
+        required: false
+        type: string
+      limit:
+        description: "limit"
+        required: false
+        type: string
+      filter:
+        description: "Structure: `[key1=value1,key2=value2&value3]`. Filter by `date`, `owner`, `organization` and `downloaded_by` are not supported"
+        required: false
+        type: string
+      search:
+        description: "search"
+        required: false
+        type: string
+
+jobs:
+  api-call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make API Request
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.API_BASE_URL }}/api/v1/packages
+          method: GET
+          customHeaders: '{"Content-Type": "application/json"}'
+          bearerToken: ${{ secrets.API_TOKEN }}
+          data: ${{ toJSON(inputs) }}

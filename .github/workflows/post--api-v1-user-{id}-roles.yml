@@ -1,0 +1,30 @@
+name: post--api-v1-user-{id}-roles
+
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: "id"
+        required: true
+        type: string
+      roles:
+        description: "roles"
+        required: true
+        type: string
+      add:
+        description: "add"
+        required: false
+        type: boolean
+
+jobs:
+  api-call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make API Request
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.API_BASE_URL }}/api/v1/user/{id}/roles
+          method: POST
+          customHeaders: '{"Content-Type": "application/json"}'
+          bearerToken: ${{ secrets.API_TOKEN }}
+          data: ${{ toJSON(inputs) }}

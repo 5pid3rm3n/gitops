@@ -1,0 +1,26 @@
+name: get--api-v1-deployment-{deploymentIdOrSlug}
+
+on:
+  workflow_dispatch:
+    inputs:
+      parse_type:
+        description: "parse_type"
+        required: false
+        type: string
+      deploymentIdOrSlug:
+        description: "deploymentIdOrSlug"
+        required: true
+        type: string
+
+jobs:
+  api-call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make API Request
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.API_BASE_URL }}/api/v1/deployment/{deploymentIdOrSlug}
+          method: GET
+          customHeaders: '{"Content-Type": "application/json"}'
+          bearerToken: ${{ secrets.API_TOKEN }}
+          data: ${{ toJSON(inputs) }}

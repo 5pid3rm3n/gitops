@@ -1,0 +1,22 @@
+name: post--api-v1-deployments-status
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployments:
+        description: "deployments"
+        required: true
+        type: string
+
+jobs:
+  api-call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make API Request
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.API_BASE_URL }}/api/v1/deployments/status
+          method: POST
+          customHeaders: '{"Content-Type": "application/json"}'
+          bearerToken: ${{ secrets.API_TOKEN }}
+          data: ${{ toJSON(inputs) }}

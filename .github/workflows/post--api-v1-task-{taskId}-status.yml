@@ -1,0 +1,34 @@
+name: post--api-v1-task-{taskId}-status
+
+on:
+  workflow_dispatch:
+    inputs:
+      expand:
+        description: "expand"
+        required: false
+        type: string
+      taskId:
+        description: "taskId"
+        required: true
+        type: string
+      status:
+        description: "status"
+        required: true
+        type: string
+      error:
+        description: "error"
+        required: false
+        type: string
+
+jobs:
+  api-call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make API Request
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.API_BASE_URL }}/api/v1/task/{taskId}/status
+          method: POST
+          customHeaders: '{"Content-Type": "application/json"}'
+          bearerToken: ${{ secrets.API_TOKEN }}
+          data: ${{ toJSON(inputs) }}
