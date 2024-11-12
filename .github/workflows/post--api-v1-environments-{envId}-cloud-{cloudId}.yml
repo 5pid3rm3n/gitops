@@ -20,7 +20,7 @@ jobs:
         id: api-request
         uses: fjogeleit/http-request-action@v1
         with:
-          url: ${{ secrets.API_BASE_URL }}/api/v1/environments/{envId}/cloud/{cloudId}
+          url: ${{ secrets.API_BASE_URL }}/api/v1/environments/${{ inputs.envId }}/cloud/${{ inputs.cloudId }}
           method: POST
           customHeaders: '{"Content-Type": "application/json"}'
           bearerToken: ${{ secrets.API_TOKEN }}

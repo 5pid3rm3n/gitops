@@ -133,9 +133,17 @@ function convertSwaggerTypeToWorkflowType(swaggerType) {
   return typeMap[swaggerType] || 'string';
 }
 
+function replacePathParameters(pathUrl) {
+  // Replace {parameter} with ${{ inputs.parameter }}
+  return pathUrl.replace(/{([^}]+)}/g, (match, param) => {
+    return `\${{ inputs.${param} }}`;
+  });
+}
+
 async function generateWorkflow(operationId, method, pathUrl, operation, swagger) {
   let inputsContent = '';
   
+  // Process URL parameters
   const parameters = operation.parameters || [];
   const parameterInputs = parameters.map(param => {
     const resolvedParam = resolveSchemaRef(param.schema, swagger.components);
@@ -155,6 +163,9 @@ async function generateWorkflow(operationId, method, pathUrl, operation, swagger
     inputsContent = parameterInputs.join('\n');
   }
 
+  // Replace path parameters with input references
+  const formattedPath = replacePathParameters(pathUrl);
+
   return `
 name: ${operationId}
 
@@ -171,7 +182,7 @@ jobs:
         id: api-request
         uses: fjogeleit/http-request-action@v1
         with:
-          url: \${{ secrets.API_BASE_URL }}${pathUrl}
+          url: \${{ secrets.API_BASE_URL }}${formattedPath}
           method: ${method.toUpperCase()}
           customHeaders: '{"Content-Type": "application/json"}'
           bearerToken: \${{ secrets.API_TOKEN }}

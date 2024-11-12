@@ -12,7 +12,7 @@ jobs:
         id: api-request
         uses: fjogeleit/http-request-action@v1
         with:
-          url: ${{ secrets.API_BASE_URL }}/api/v1/task/{taskId}/deployments
+          url: ${{ secrets.API_BASE_URL }}/api/v1/task/${{ inputs.taskId }}/deployments
           method: POST
           customHeaders: '{"Content-Type": "application/json"}'
           bearerToken: ${{ secrets.API_TOKEN }}

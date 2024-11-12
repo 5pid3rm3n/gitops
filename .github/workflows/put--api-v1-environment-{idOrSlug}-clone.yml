@@ -16,7 +16,7 @@ jobs:
         id: api-request
         uses: fjogeleit/http-request-action@v1
         with:
-          url: ${{ secrets.API_BASE_URL }}/api/v1/environment/{idOrSlug}/clone
+          url: ${{ secrets.API_BASE_URL }}/api/v1/environment/${{ inputs.idOrSlug }}/clone
           method: PUT
           customHeaders: '{"Content-Type": "application/json"}'
           bearerToken: ${{ secrets.API_TOKEN }}
