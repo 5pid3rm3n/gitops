@@ -178,7 +178,7 @@ jobs:
           data: \${{ toJSON(inputs) }}
       
       - name: Response
-        run: echo \${{ fromJSON(steps.api-request.outputs.response) }} | jq .
+        run: echo \${{ toJSON(steps.api-request.outputs.response) }} | jq . 
   `;
 }
 
