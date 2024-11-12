@@ -109,4 +109,17 @@ The converter includes:
 4. Push to the branch
 5. Create a new Pull Request
 
+## Known Issues
 
+Currently, the following files have issues with the conversion:
+- get--api-v1-organization-roles.yml
+- get--api-v1-organization.yml
+- get--api-v1-tasks.yml
+- post--api-v1-deployment-plan.yml
+- post--api-v1-deployments-{deploymentId}-files.yml
+- post--api-v1-deployments-approve.yml
+- post--api-v1-deployments-archive.yml
+- post--api-v1-deployments-cancel.yml
+- post--api-v1-deployments-unarchive.yml
+- post--api-v1-package.yml
+- post--api-v1-rescue-tf-extract.yml
