@@ -6,11 +6,11 @@ on:
       limit:
         description: "limit"
         required: false
-        type: string
+        type: number
       offset:
         description: "offset"
         required: false
-        type: string
+        type: number
 
 jobs:
   api-call:

@@ -3,6 +3,14 @@ name: put--api-v1-environment
 on:
   workflow_dispatch:
     inputs:
+      slug:
+        description: "slug"
+        required: true
+        type: string
+      id:
+        description: "id (uuid)"
+        required: true
+        type: string
 
 jobs:
   api-call:

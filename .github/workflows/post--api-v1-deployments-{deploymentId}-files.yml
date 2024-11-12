@@ -3,10 +3,6 @@ name: post--api-v1-deployments-{deploymentId}-files
 on:
   workflow_dispatch:
     inputs:
-      deploymentId:
-        description: "deploymentId"
-        required: true
-        type: string
 
 jobs:
   api-call:

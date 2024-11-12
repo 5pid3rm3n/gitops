@@ -6,7 +6,7 @@ on:
       all:
         description: "all"
         required: false
-        type: string
+        type: boolean
 
 jobs:
   api-call:

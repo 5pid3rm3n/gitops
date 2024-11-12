@@ -22,19 +22,19 @@ on:
       offset:
         description: "offset"
         required: false
-        type: string
+        type: number
       limit:
         description: "limit"
         required: false
-        type: string
+        type: number
       expand:
         description: "expand"
         required: false
-        type: string
+        type: boolean
       latest:
         description: "latest"
         required: false
-        type: string
+        type: boolean
       filter:
         description: "Structure: `[key1=value1,key2=value2&value3]`. Filter by `date` is not supported"
         required: false
@@ -50,7 +50,7 @@ on:
       archived:
         description: "archived"
         required: false
-        type: string
+        type: boolean
 
 jobs:
   api-call:

@@ -3,6 +3,18 @@ name: put--api-v1-environment-{idOrSlug}-props
 on:
   workflow_dispatch:
     inputs:
+      idOrSlug:
+        description: "idOrSlug"
+        required: true
+        type: string
+      name:
+        description: "name"
+        required: true
+        type: string
+      content:
+        description: "content"
+        required: true
+        type: string
 
 jobs:
   api-call:

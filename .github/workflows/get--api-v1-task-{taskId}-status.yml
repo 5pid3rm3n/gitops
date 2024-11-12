@@ -6,7 +6,7 @@ on:
       expand:
         description: "expand"
         required: false
-        type: string
+        type: boolean
       taskId:
         description: "taskId"
         required: true
