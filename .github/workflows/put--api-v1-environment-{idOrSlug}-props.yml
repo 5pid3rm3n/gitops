@@ -9,11 +9,11 @@ on:
         type: string
       name:
         description: "name"
-        required: true
+        required: false
         type: string
       content:
         description: "content"
-        required: true
+        required: false
         type: string
 
 jobs:

@@ -12,7 +12,7 @@ on:
         required: true
         type: string
       status:
-        description: "status"
+        description: "status (pending, planning, no_change, planned, plan_approved, installing, canceled, completed, error)"
         required: true
         type: string
       error:

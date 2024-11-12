@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       action:
-        description: "action"
+        description: "action (error)"
         required: true
         type: string
       payload:

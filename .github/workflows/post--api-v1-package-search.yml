@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       sort:
-        description: "sort"
+        description: "sort (created, qualified_name, verified_at, downloads, description)"
         required: false
         type: string
       order:

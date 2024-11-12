@@ -3,6 +3,54 @@ name: post--api-v1-task-{taskId}-deployments
 on:
   workflow_dispatch:
     inputs:
+      taskId:
+        description: "taskId"
+        required: true
+        type: string
+      package.name:
+        description: "package.name"
+        required: false
+        type: string
+      package.version:
+        description: "package.version"
+        required: false
+        type: string
+      package.uniqueId:
+        description: "package.uniqueId"
+        required: false
+        type: string
+      package.type:
+        description: "package.type (blueprint, artifact)"
+        required: false
+        type: string
+      dependencies.direct:
+        description: "dependencies.direct"
+        required: false
+        type: string
+      parent:
+        description: "parent"
+        required: false
+        type: string
+      action:
+        description: "action (error)"
+        required: true
+        type: string
+      payload:
+        description: "payload"
+        required: false
+        type: string
+      payload.plan_file_url:
+        description: "payload.plan_file_url"
+        required: false
+        type: string
+      payload.state_file_url:
+        description: "payload.state_file_url"
+        required: false
+        type: string
+      payload.error:
+        description: "payload.error"
+        required: false
+        type: string
 
 jobs:
   api-call:

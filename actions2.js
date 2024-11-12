@@ -8,36 +8,15 @@ function resolveSchemaRef(schema, components = {}) {
   
   if (schema.$ref) {
     try {
-      // Remove #/ prefix and split into parts
       const refPath = schema.$ref.replace('#/', '').split('/');
       let resolved = components;
-      
-      // Debug log
-      console.log(`Resolving reference: ${schema.$ref}`);
-      console.log('Available components:', Object.keys(components));
-      
       for (const part of refPath) {
         resolved = resolved?.[part];
         if (!resolved) {
-          console.warn(`Warning: Could not resolve reference ${schema.$ref} at part ${part}`);
-          console.warn('Available paths:', Object.keys(resolved || {}));
+          console.warn(`Warning: Could not resolve reference ${schema.$ref}`);
           return {};
         }
       }
-      
-      // If resolved schema is an array type, preserve its structure
-      if (resolved.type === 'array') {
-        return {
-          type: 'array',
-          items: {
-            type: resolved.items.type || 'object',
-            properties: resolved.items.properties || {},
-            required: resolved.items.required || []
-          },
-          description: resolved.description || 'Array of items'
-        };
-      }
-      
       return resolved;
     } catch (error) {
       console.warn(`Warning: Error resolving reference: ${error.message}`);
@@ -45,41 +24,94 @@ function resolveSchemaRef(schema, components = {}) {
     }
   }
 
-  // Handle direct array type schemas
   if (schema.type === 'array' && schema.items) {
     const resolvedItems = resolveSchemaRef(schema.items, components);
     return {
       type: 'array',
       items: resolvedItems,
-      properties: resolvedItems.properties || {},
-      required: resolvedItems.required || []
+      properties: resolvedItems.properties || {}
     };
   }
 
   return schema;
 }
+
 function extractSchemaProperties(requestBody, components) {
   if (!requestBody?.content?.['application/json']?.schema) {
     return { properties: {}, required: [] };
   }
 
   const schema = resolveSchemaRef(requestBody.content['application/json'].schema, components);
+  const required = schema.required || [];
 
-  if (schema.type === 'array') {
-    return {
-      properties: schema.items.properties || {},
-      required: schema.items.required || []
-    };
+  if (schema.type === 'array' && schema.items?.oneOf) {
+    return extractArrayItemProperties(schema);
   }
 
   if (schema.oneOf) {
     return processOneOfSchemas(schema.oneOf);
   }
 
+  if (schema.properties) {
+    return {
+      properties: Object.entries(schema.properties).reduce((acc, [key, prop]) => {
+        const enumValues = prop.enum ? ` (${prop.enum.join(', ')})` : '';
+        acc[key] = {
+          ...prop,
+          description: `${prop.description || key}${enumValues}`,
+          required: required.includes(key)
+        };
+        return acc;
+      }, {}),
+      required
+    };
+  }
+
+  return { properties: {}, required: [] };
+}
+
+function extractArrayItemProperties(schema) {
+  const allProperties = {};
+  const allRequired = new Set();
+
+  schema.items.oneOf.forEach(variant => {
+    if (variant.type === 'object') {
+      const { properties, required } = extractNestedProperties(variant);
+      Object.entries(properties).forEach(([key, value]) => {
+        allProperties[key] = value;
+      });
+      required.forEach(req => allRequired.add(req));
+    }
+  });
+
   return {
-    properties: schema.properties || {},
-    required: schema.required || []
+    properties: allProperties,
+    required: Array.from(allRequired)
   };
+}
+
+function extractNestedProperties(schema, prefix = '') {
+  let properties = {};
+  let required = [];
+
+  if (schema.type === 'object' && schema.properties) {
+    Object.entries(schema.properties).forEach(([key, prop]) => {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      
+      if (prop.type === 'object' && prop.properties) {
+        const nested = extractNestedProperties(prop, fullKey);
+        properties = { ...properties, ...nested.properties };
+        required = [...required, ...nested.required.map(r => `${fullKey}.${r}`)];
+      } else {
+        properties[fullKey] = prop;
+        if (schema.required?.includes(key)) {
+          required.push(fullKey);
+        }
+      }
+    });
+  }
+
+  return { properties, required };
 }
 
 function processOneOfSchemas(oneOfSchemas) {
@@ -103,24 +135,6 @@ function processOneOfSchemas(oneOfSchemas) {
   };
 }
 
-async function generateInputsFromProperties(properties = {}, required = [], components = {}) {
-  if (!properties || typeof properties !== 'object') {
-    return '';
-  }
-
-  return Object.entries(properties).map(([name, schema]) => {
-    const resolvedSchema = resolveSchemaRef(schema, components) || {};
-    const isRequired = Array.isArray(required) && required.includes(name);
-    const description = resolvedSchema.description || 
-                       (resolvedSchema.format ? `${name} (${resolvedSchema.format})` : name);
-    
-    return `      ${name}:
-        description: '${description}'
-        required: ${isRequired}
-        type: ${convertSwaggerTypeToWorkflowType(resolvedSchema.type)}`;
-  }).join('\n');
-}
-
 function convertSwaggerTypeToWorkflowType(swaggerType) {
   const typeMap = {
     'string': 'string',
@@ -133,8 +147,24 @@ function convertSwaggerTypeToWorkflowType(swaggerType) {
   return typeMap[swaggerType] || 'string';
 }
 
+async function generateInputsFromProperties(properties = {}, required = [], components = {}) {
+  if (!properties || typeof properties !== 'object') {
+    return '';
+  }
+
+  return Object.entries(properties).map(([name, schema]) => {
+    const isRequired = Array.isArray(required) && required.includes(name);
+    const description = schema.description || 
+                       (schema.enum ? `${name} (${schema.enum.join(', ')})` : name);
+    
+    return `      ${name}:
+        description: '${description}'
+        required: ${isRequired}
+        type: ${convertSwaggerTypeToWorkflowType(schema.type)}`;
+  }).join('\n');
+}
+
 function replacePathParameters(pathUrl) {
-  // Replace {parameter} with ${{ inputs.parameter }}
   return pathUrl.replace(/{([^}]+)}/g, (match, param) => {
     return `\${{ inputs.${param} }}`;
   });
@@ -143,7 +173,6 @@ function replacePathParameters(pathUrl) {
 async function generateWorkflow(operationId, method, pathUrl, operation, swagger) {
   let inputsContent = '';
   
-  // Process URL parameters
   const parameters = operation.parameters || [];
   const parameterInputs = parameters.map(param => {
     const resolvedParam = resolveSchemaRef(param.schema, swagger.components);
@@ -163,7 +192,6 @@ async function generateWorkflow(operationId, method, pathUrl, operation, swagger
     inputsContent = parameterInputs.join('\n');
   }
 
-  // Replace path parameters with input references
   const formattedPath = replacePathParameters(pathUrl);
 
   return `
@@ -189,7 +217,7 @@ jobs:
           data: \${{ toJSON(inputs) }}
       
       - name: Response
-        run: echo \${{ toJSON(steps.api-request.outputs.response) }} | jq . 
+        run: echo \${{ toJSON(steps.api-request.outputs.response) }} | jq .
   `;
 }
 

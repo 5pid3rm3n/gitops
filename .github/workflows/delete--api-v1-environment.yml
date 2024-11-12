@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       id:
-        description: "id (uuid)"
+        description: "id"
         required: true
         type: string
 
