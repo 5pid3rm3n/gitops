@@ -168,6 +168,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Make API Request
+        id: api-request
         uses: fjogeleit/http-request-action@v1
         with:
           url: \${{ secrets.API_BASE_URL }}${pathUrl}
@@ -175,6 +176,9 @@ jobs:
           customHeaders: '{"Content-Type": "application/json"}'
           bearerToken: \${{ secrets.API_TOKEN }}
           data: \${{ toJSON(inputs) }}
+      
+      - name: Response
+        run: echo \${{ steps.api-request.outputs.response }}
   `;
 }
 
