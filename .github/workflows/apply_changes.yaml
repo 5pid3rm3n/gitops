@@ -2,9 +2,6 @@ name: Apply changes to environments
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   apply-changes-to-environments:
