@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       envId:
-        description: "envId"
+        description: "envId (uuid)"
         required: true
         type: string
       cloudId:
-        description: "cloudId"
+        description: "cloudId (uuid)"
         required: true
         type: string
 
