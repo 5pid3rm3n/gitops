@@ -3,7 +3,10 @@ name: delete--api-v1-environment-{idOrSlug}-props
 on:
   workflow_dispatch:
     inputs:
-
+      idOrSlug:
+        description: "idOrSlug"
+        required: true
+        type: string
 jobs:
   api-call:
     runs-on: ubuntu-latest
